@@ -1,24 +1,26 @@
-# README
+# Coverband Rails Demo
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+It has been awhile since I built and hosted a Coverband Rails example app. This demo is intended to show how to get up and running with Coverband and some of the various configuration options.
 
-Things you may want to cover:
+* See the [Coverband Repo](https://github.com/danmayer/coverband) for documentation and more details
 
-* Ruby version
+# Getting Started
 
-* System dependencies
+* `git clone git@github.com:danmayer/coverband_rails_example.git`
+* `bundle install`
+* `bundle exec rails s`
+* open: http://localhost:3000/coverage
 
-* Configuration
+# Demo Dependencies
 
-* Database creation
+* built with Rails 7.1
+* Ruby 3.2.2
 
-* Database initialization
+# TODO
 
-* How to run the test suite
+* setup and ensure folks can test via docker
+* deploy the docker image somewhere
 
-* Services (job queues, cache servers, search engines, etc.)
+# How to run the test suite
 
-* Deployment instructions
-
-* ...
+* `bundle exec rake`
