@@ -19,6 +19,6 @@ Coverband.configure do |config|
     config.reporting_wiggle = 2
 
     # in developer mode we want to report more often than in production, in production I often set this to every 5 minutes (300 seconds)
-    config.background_reporting_sleep_seconds = 20000
-    # config.background_reporting_sleep_seconds = 2
+    # config.background_reporting_sleep_seconds = 300
+    config.background_reporting_sleep_seconds = 10
   end
