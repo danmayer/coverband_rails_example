@@ -1,7 +1,7 @@
 Coverband.configure do |config|
     config.logger = Rails.logger
 
-    if ENV["COVERBAND_HASH_STORE"]
+    if ENV["COVERBAND_HASH_STORE"] || ENV["COVERBAND_PAGER"]
       puts "using hash store"
       config.store = Coverband::Adapters::HashRedisStore.new(Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/0'))
     end
