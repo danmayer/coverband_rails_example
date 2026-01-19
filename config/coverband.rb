@@ -1,6 +1,11 @@
 Coverband.configure do |config|
     config.logger = Rails.logger
 
+    # Sanitize REDIS_URL if it's missing the scheme (common copy-paste error)
+    if ENV['REDIS_URL'] && !ENV['REDIS_URL'].match?(%r{^redis(s)?://})
+      ENV['REDIS_URL'] = "redis://#{ENV['REDIS_URL']}"
+    end
+
     if ENV["COVERBAND_HASH_STORE"] || ENV["COVERBAND_PAGER"]
       puts "using hash store"
       config.store = Coverband::Adapters::HashRedisStore.new(Redis.new(url: ENV['REDIS_URL'] || 'redis://localhost:6379/0'))

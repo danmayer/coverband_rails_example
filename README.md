@@ -16,10 +16,18 @@ It has been awhile since I built and hosted a Coverband Rails example app. This 
 * built with Rails 7.1
 * Ruby 3.2.2
 
-# TODO
+# Deploy to Render
 
-* setup and ensure folks can test via docker
-* deploy the docker image somewhere
+This application is configured to be easily deployed on [Render.com](https://render.com).
+
+1.  Fork this repository.
+2.  Create a new Web Service on Render.
+3.  Connect your GitHub account and select your forked repository.
+4.  Render will automatically detect the `render.yaml` blueprint (or you can select "Docker" as the runtime).
+5.  **Important:** Coverband requires Redis. Render does not offer a free Redis instance that persists.
+    *   Sign up for a free Redis instance at [Upstash](https://upstash.com/) or [Redis Cloud](https://redis.com/try-free/).
+    *   Get your Redis connection URL (e.g., `redis://default:password@fly-foo-bar.upstash.io:6379`).
+    *   In the Render dashboard for your service, add an Environment Variable named `REDIS_URL` with your connection string.
 
 # How to run the test suite
 
