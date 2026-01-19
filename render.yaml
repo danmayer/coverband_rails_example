@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: coverband-demo
+    env: docker
+    plan: free
+    buildCommand: docker build -t coverband-demo .
+    startCommand: ./bin/rails server
+    envVars:
+      - key: RAILS_MASTER_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 2
+      - key: REDIS_URL
+        sync: false
