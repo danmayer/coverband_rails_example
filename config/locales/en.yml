@@ -29,3 +29,60 @@
 
 en:
   hello: "Hello world"
+
+  # App-wide translations
+  app:
+    title: "Coverband Rails Demo"
+    subtitle: "Explore Coverband's features and configuration options"
+    navigation:
+      home: "Home"
+      posts: "Posts"
+      books: "Books"
+      coverage: "Coverage Report"
+      config: "Configuration"
+
+  # Posts translations
+  posts:
+    title: "Posts"
+    new: "New Post"
+    edit: "Edit Post"
+    show: "Show Post"
+    created: "Post was successfully created."
+    updated: "Post was successfully updated."
+    destroyed: "Post was successfully destroyed."
+    author: "Author"
+    content: "Content"
+    actions: "Actions"
+
+  # Books translations
+  books:
+    title: "Books"
+    new: "New Book"
+    edit: "Edit Book"
+    show: "Show Book"
+    created: "Book was successfully created."
+    updated: "Book was successfully updated."
+    destroyed: "Book was successfully destroyed."
+    author: "Author"
+    content: "Content"
+    actions: "Actions"
+
+  # Common translations
+  common:
+    edit: "Edit"
+    delete: "Delete"
+    back: "Back"
+    save: "Save"
+    cancel: "Cancel"
+    confirm: "Are you sure?"
+
+  # Demo-specific translations
+  demo:
+    features:
+      title: "Coverband Features"
+      view_tracking: "View Tracking"
+      translation_tracking: "Translation Tracking"
+      router_tracking: "Router Tracking"
+      code_coverage: "Code Coverage"
+    welcome: "Welcome to the Coverband demo application!"
+    description: "This app demonstrates all of Coverband's tracking features."

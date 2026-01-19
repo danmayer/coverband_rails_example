@@ -1,0 +1,110 @@
+require:
+  - rubocop-rails
+  - rubocop-performance
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.4
+  Exclude:
+    - 'bin/**/*'
+    - 'db/**/*'
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+    - 'config/environments/*'
+    - 'config/initializers/*'
+    - 'config/application.rb'
+    - 'config/boot.rb'
+    - 'config/environment.rb'
+    - 'config/puma.rb'
+
+# Documentation is already provided in extensive comments and separate docs
+Style/Documentation:
+  Enabled: false
+
+# Allow longer lines in views and tests
+Layout/LineLength:
+  Max: 120
+  Exclude:
+    - 'app/views/**/*'
+    - 'test/**/*'
+
+# Allow longer methods in tests and demo controllers
+Metrics/MethodLength:
+  Max: 30
+  Exclude:
+    - 'test/**/*'
+    - 'Rakefile'
+    - 'config/routes.rb'
+    - 'app/controllers/demo_controller.rb'
+
+# Allow longer blocks in tests and Rake tasks
+Metrics/BlockLength:
+  Exclude:
+    - 'test/**/*'
+    - 'Rakefile'
+    - 'config/routes.rb'
+    - 'lib/tasks/**/*'
+    - 'config/coverband.rb'
+
+# Allow more complex tests and demo controllers
+Metrics/AbcSize:
+  Exclude:
+    - 'test/**/*'
+    - 'Rakefile'
+    - 'app/controllers/demo_controller.rb'
+
+# Allow longer classes in tests
+Metrics/ClassLength:
+  Exclude:
+    - 'test/**/*'
+
+# Prefer double quotes for consistency
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# Allow trailing commas
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: comma
+
+# Allow both lambda styles
+Style/Lambda:
+  Enabled: false
+
+# Allow both hash styles
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
+
+# This is a demo app, frozen string literals are not critical
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Allow compact module/class definitions
+Style/ClassAndModuleChildren:
+  Enabled: false
+
+# Allow empty rescue for optional operations
+Lint/SuppressedException:
+  AllowComments: true
+
+# Allow standard Rails scaffold messages
+Rails/I18nLocaleTexts:
+  Exclude:
+    - 'app/controllers/posts_controller.rb'
+    - 'app/controllers/books_controller.rb'
+
+# Demo controllers have intentionally complex methods for demonstration
+Metrics/CyclomaticComplexity:
+  Exclude:
+    - 'app/controllers/demo_controller.rb'
+
+Metrics/PerceivedComplexity:
+  Exclude:
+    - 'app/controllers/demo_controller.rb'

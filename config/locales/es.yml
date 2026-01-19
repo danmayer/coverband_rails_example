@@ -1,0 +1,59 @@
+es:
+  hello: "Hola mundo"
+
+  # App-wide translations
+  app:
+    title: "Demo de Coverband Rails"
+    subtitle: "Explora las características y opciones de configuración de Coverband"
+    navigation:
+      home: "Inicio"
+      posts: "Publicaciones"
+      books: "Libros"
+      coverage: "Reporte de Cobertura"
+      config: "Configuración"
+
+  # Posts translations
+  posts:
+    title: "Publicaciones"
+    new: "Nueva Publicación"
+    edit: "Editar Publicación"
+    show: "Mostrar Publicación"
+    created: "La publicación fue creada exitosamente."
+    updated: "La publicación fue actualizada exitosamente."
+    destroyed: "La publicación fue eliminada exitosamente."
+    author: "Autor"
+    content: "Contenido"
+    actions: "Acciones"
+
+  # Books translations
+  books:
+    title: "Libros"
+    new: "Nuevo Libro"
+    edit: "Editar Libro"
+    show: "Mostrar Libro"
+    created: "El libro fue creado exitosamente."
+    updated: "El libro fue actualizado exitosamente."
+    destroyed: "El libro fue eliminado exitosamente."
+    author: "Autor"
+    content: "Contenido"
+    actions: "Acciones"
+
+  # Common translations
+  common:
+    edit: "Editar"
+    delete: "Eliminar"
+    back: "Volver"
+    save: "Guardar"
+    cancel: "Cancelar"
+    confirm: "¿Estás seguro?"
+
+  # Demo-specific translations
+  demo:
+    features:
+      title: "Características de Coverband"
+      view_tracking: "Seguimiento de Vistas"
+      translation_tracking: "Seguimiento de Traducciones"
+      router_tracking: "Seguimiento de Rutas"
+      code_coverage: "Cobertura de Código"
+    welcome: "¡Bienvenido a la aplicación de demostración de Coverband!"
+    description: "Esta aplicación demuestra todas las características de seguimiento de Coverband."

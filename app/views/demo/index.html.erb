@@ -1,0 +1,204 @@
+<div class="demo-home">
+  <h1><%= t('demo.welcome') %></h1>
+  <p><%= t('demo.description') %></p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <h2><%= t('demo.features.code_coverage') %></h2>
+      <p>Track which lines of code are executed in your application. View detailed coverage reports showing runtime vs test coverage.</p>
+      <ul>
+        <li>Real-time runtime coverage collection</li>
+        <li>Line-by-line coverage analysis</li>
+        <li>Integration with SimpleCov for test coverage</li>
+        <li>Web UI for viewing coverage reports</li>
+      </ul>
+      <%= link_to "View Coverage Report", "/coverage", class: "btn btn-primary", target: "_blank" %>
+    </div>
+
+    <div class="feature-card">
+      <h2><%= t('demo.features.view_tracking') %></h2>
+      <p>Monitor which views and partials are rendered in your Rails application.</p>
+      <ul>
+        <li>Track all rendered views and partials</li>
+        <li>Identify unused view templates</li>
+        <li>Optimize view rendering performance</li>
+        <li>Current status: <strong><%= Coverband.configuration.track_views ? "Enabled" : "Disabled" %></strong></li>
+      </ul>
+      <%= link_to "Try it: View Posts", posts_path, class: "btn btn-secondary" %>
+      <%= link_to "Try it: View Books", books_path, class: "btn btn-secondary" %>
+    </div>
+
+    <div class="feature-card">
+      <h2><%= t('demo.features.translation_tracking') %></h2>
+      <p>Track which I18n translation keys are actually used in your application.</p>
+      <ul>
+        <li>Discover unused translation keys</li>
+        <li>Identify missing translations</li>
+        <li>Support for multiple locales</li>
+        <li>Current status: <strong><%= Coverband.configuration.track_translations ? "Enabled" : "Disabled" %></strong></li>
+      </ul>
+      <p>This page uses translations! Check the coverage report to see which keys were accessed.</p>
+    </div>
+
+    <div class="feature-card">
+      <h2><%= t('demo.features.router_tracking') %></h2>
+      <p>Monitor which routes in your application are being accessed.</p>
+      <ul>
+        <li>Track route usage patterns</li>
+        <li>Identify unused routes</li>
+        <li>Optimize routing configuration</li>
+        <li>Current status: <strong><%= Coverband.configuration.track_routes ? "Enabled" : "Disabled" %></strong></li>
+      </ul>
+      <%= link_to "View All Routes", demo_configuration_path, class: "btn btn-secondary" %>
+    </div>
+  </div>
+
+  <div class="demo-sections">
+    <div class="demo-section">
+      <h2>Configuration</h2>
+      <p>Learn how to configure Coverband and test different storage backends and settings.</p>
+      <%= link_to "View Configuration Options", demo_configuration_path, class: "btn btn-primary" %>
+    </div>
+
+    <div class="demo-section">
+      <h2>Benchmarks</h2>
+      <p>Run performance benchmarks to understand Coverband's impact on your application.</p>
+      <%= link_to "View Benchmarks", demo_benchmarks_path, class: "btn btn-primary" %>
+    </div>
+
+    <div class="demo-section">
+      <h2>Memory Profiling</h2>
+      <p>Monitor memory usage and understand Coverband's memory footprint.</p>
+      <%= link_to "View Memory Stats", demo_profiling_path, class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <div class="getting-started">
+    <h2>Getting Started with Your App</h2>
+    <ol>
+      <li>Add Coverband to your Gemfile: <code>gem 'coverband'</code></li>
+      <li>Run <code>bundle install</code></li>
+      <li>Create a configuration file at <code>config/coverband.rb</code></li>
+      <li>Mount the web interface in your routes</li>
+      <li>Start your app and visit <code>/coverage</code></li>
+    </ol>
+    <p>For detailed documentation, visit the <%= link_to "Coverband GitHub repository", "https://github.com/danmayer/coverband", target: "_blank" %>.</p>
+  </div>
+</div>
+
+<style>
+  .demo-home {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .demo-home h1 {
+    color: #333;
+    margin-bottom: 10px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+  }
+
+  .feature-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background: #f9f9f9;
+  }
+
+  .feature-card h2 {
+    color: #2c5aa0;
+    margin-top: 0;
+  }
+
+  .feature-card ul {
+    margin: 15px 0;
+    padding-left: 20px;
+  }
+
+  .feature-card li {
+    margin: 8px 0;
+  }
+
+  .demo-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+  }
+
+  .demo-section {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    background: white;
+  }
+
+  .demo-section h2 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .getting-started {
+    margin: 40px 0;
+    padding: 20px;
+    background: #f0f7ff;
+    border-radius: 8px;
+    border-left: 4px solid #2c5aa0;
+  }
+
+  .getting-started h2 {
+    margin-top: 0;
+    color: #2c5aa0;
+  }
+
+  .getting-started ol {
+    margin: 15px 0;
+    padding-left: 25px;
+  }
+
+  .getting-started li {
+    margin: 10px 0;
+  }
+
+  .getting-started code {
+    background: #e8e8e8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 5px 5px 5px 0;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s;
+  }
+
+  .btn-primary {
+    background: #2c5aa0;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #1e4070;
+  }
+
+  .btn-secondary {
+    background: #6c757d;
+    color: white;
+  }
+
+  .btn-secondary:hover {
+    background: #545b62;
+  }
+</style>

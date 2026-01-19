@@ -1,0 +1,257 @@
+<div class="demo-benchmarks">
+  <h1>Performance Benchmarks</h1>
+
+  <%= link_to "← Back to Demo Home", demo_path, class: "back-link" %>
+
+  <div class="benchmark-section">
+    <h2>Available Benchmarks</h2>
+    <p>These rake tasks help you measure Coverband's performance impact on your application.</p>
+
+    <div class="benchmark-card">
+      <h3>Coverage Report Performance</h3>
+      <p>Benchmark how long it takes to generate the coverage report page.</p>
+
+      <h4>Basic Benchmark</h4>
+      <pre><code>COVERBAND_DISABLE_AUTO_START=true bundle exec rake coverband_benchmark</code></pre>
+      <p>This measures the time to render the main coverage page without collecting any coverage data during the benchmark.</p>
+
+      <h4>With HashRedisStore</h4>
+      <pre><code>COVERBAND_DISABLE_AUTO_START=true COVERBAND_HASH_STORE=true bundle exec rake coverband_benchmark</code></pre>
+      <p>Compare performance using the HashRedisStore adapter.</p>
+
+      <h4>With Paged Reporting</h4>
+      <pre><code>COVERBAND_DISABLE_AUTO_START=true COVERBAND_PAGER=true COVERBAND_HASH_STORE=true bundle exec rake coverband_benchmark</code></pre>
+      <p>Test the paged reporting feature for better performance with large codebases.</p>
+    </div>
+
+    <div class="benchmark-card">
+      <h3>Single File Detail Performance</h3>
+      <p>Benchmark how long it takes to load detailed coverage for a single file.</p>
+      <pre><code>COVERBAND_DISABLE_AUTO_START=true bundle exec rake coverband_benchmark_single_file</code></pre>
+      <p>This is useful for understanding the performance of the drill-down view.</p>
+    </div>
+
+    <div class="benchmark-card">
+      <h3>Network Latency Simulation</h3>
+      <p>The benchmarks use Toxiproxy to add realistic network latency to Redis connections.</p>
+
+      <h4>Setup Toxiproxy</h4>
+      <pre><code># Install toxiproxy
+brew install toxiproxy  # macOS
+# or download from https://github.com/Shopify/toxiproxy
+
+# Start toxiproxy server
+sudo systemctl start toxiproxy  # Linux
+# or
+toxiproxy-server  # Run directly</code></pre>
+
+      <p>The benchmarks automatically add latency:</p>
+      <ul>
+        <li>Coverage page: 50ms latency</li>
+        <li>Single file: 25ms latency</li>
+      </ul>
+      <p>This simulates real-world conditions where Redis might not be on localhost.</p>
+    </div>
+  </div>
+
+  <div class="benchmark-section">
+    <h2>Testing at Scale</h2>
+    <p>Generate many files to test how Coverband performs with large codebases.</p>
+
+    <div class="benchmark-card">
+      <h3>Generate Test Files</h3>
+      <p>Create a large number of model files to simulate a big application:</p>
+      <pre><code>FILE_COUNT=1000 bundle exec rake generate_files</code></pre>
+      <p>This creates model files in <code>app/models/</code> with some covered and uncovered code.</p>
+
+      <h3>Execute Generated Files</h3>
+      <p>Run code from the generated files to create coverage data:</p>
+      <pre><code>FILE_COUNT=1000 bundle exec rake execute_files</code></pre>
+      <p>This ensures Coverband has data for all the generated files.</p>
+
+      <h3>Full Workflow Example</h3>
+      <pre><code># Generate 4500 files
+FILE_COUNT=4500 bundle exec rake generate_files
+
+# Execute them to create coverage data
+FILE_COUNT=4500 bundle exec rake execute_files
+
+# Benchmark the coverage report
+COVERBAND_DISABLE_AUTO_START=true COVERBAND_HASH_STORE=true bundle exec rake coverband_benchmark
+
+# View the results in the web interface
+open http://localhost:3000/coverage</code></pre>
+    </div>
+  </div>
+
+  <div class="benchmark-section">
+    <h2>Runtime Overhead Benchmarks</h2>
+    <p>Measure the runtime performance impact of Coverband on your application.</p>
+
+    <div class="benchmark-card">
+      <h3>Request Benchmarks</h3>
+      <p>Compare request times with and without Coverband:</p>
+
+      <h4>Without Coverband</h4>
+      <pre><code>COVERBAND_DISABLE_AUTO_START=true bundle exec rails s
+# Then use ApacheBench or wrk to measure
+ab -n 1000 -c 10 http://localhost:3000/posts</code></pre>
+
+      <h4>With Coverband</h4>
+      <pre><code>bundle exec rails s
+# Then use ApacheBench or wrk to measure
+ab -n 1000 -c 10 http://localhost:3000/posts</code></pre>
+
+      <h4>Using wrk (more advanced)</h4>
+      <pre><code>wrk -t12 -c400 -d30s http://localhost:3000/posts</code></pre>
+    </div>
+
+    <div class="benchmark-card">
+      <h3>Boot Time Impact</h3>
+      <p>Measure how Coverband affects application boot time:</p>
+      <pre><code># Without Coverband
+COVERBAND_DISABLE_AUTO_START=true time bundle exec rails runner "puts 'Ready'"
+
+# With Coverband
+time bundle exec rails runner "puts 'Ready'"</code></pre>
+    </div>
+  </div>
+
+  <div class="benchmark-section">
+    <h2>Understanding the Results</h2>
+
+    <div class="results-info">
+      <h3>Typical Performance Characteristics</h3>
+
+      <h4>Small Applications (< 500 files)</h4>
+      <ul>
+        <li>Coverage page load: 50-200ms</li>
+        <li>Runtime overhead: < 5%</li>
+        <li>Memory overhead: 10-20MB</li>
+      </ul>
+
+      <h4>Medium Applications (500-2000 files)</h4>
+      <ul>
+        <li>Coverage page load: 200-500ms with default store</li>
+        <li>Coverage page load: 100-300ms with HashRedisStore</li>
+        <li>Runtime overhead: 5-10%</li>
+        <li>Memory overhead: 20-50MB</li>
+      </ul>
+
+      <h4>Large Applications (2000+ files)</h4>
+      <ul>
+        <li>Coverage page load: 500ms-2s with default store</li>
+        <li>Coverage page load: 200-800ms with HashRedisStore + paging</li>
+        <li>Runtime overhead: 10-15%</li>
+        <li>Memory overhead: 50-100MB</li>
+      </ul>
+
+      <h3>Optimization Tips</h3>
+      <ul>
+        <li>Use <code>HashRedisStore</code> for better performance with many files</li>
+        <li>Enable paging (<code>COVERBAND_PAGER=true</code>) for large codebases</li>
+        <li>Increase <code>background_reporting_sleep_seconds</code> in production (300s recommended)</li>
+        <li>Disable unnecessary trackers (views, translations, routes) if not needed</li>
+        <li>Use <code>config.ignore</code> to exclude vendor code and reduce overhead</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .demo-benchmarks {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2c5aa0;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .benchmark-section {
+    margin: 30px 0;
+  }
+
+  .benchmark-section h2 {
+    color: #2c5aa0;
+    border-bottom: 2px solid #2c5aa0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .benchmark-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .benchmark-card h3 {
+    color: #333;
+    margin-top: 0;
+  }
+
+  .benchmark-card h4 {
+    color: #555;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .benchmark-card pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+
+  .benchmark-card code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .benchmark-card ul {
+    margin: 10px 0;
+    padding-left: 25px;
+  }
+
+  .benchmark-card li {
+    margin: 5px 0;
+  }
+
+  .results-info {
+    background: #f0f7ff;
+    border-left: 4px solid #2c5aa0;
+    padding: 20px;
+    border-radius: 4px;
+  }
+
+  .results-info h3 {
+    color: #2c5aa0;
+    margin-top: 0;
+  }
+
+  .results-info h4 {
+    color: #333;
+    margin-top: 20px;
+  }
+
+  .results-info ul {
+    margin: 10px 0;
+    padding-left: 25px;
+  }
+
+  .results-info li {
+    margin: 8px 0;
+  }
+</style>

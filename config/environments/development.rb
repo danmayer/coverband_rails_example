@@ -9,7 +9,11 @@ Rails.application.configure do
   config.enable_reloading = true
 
   # Do not eager load code on boot.
-  config.eager_load = false
+  # config.eager_load = false
+  # NOTE: if you want to see how coverband gets eager loaded runtime files in a real app
+  # uncomment the following line and run the server...
+  # often folks do not eager load in development.
+  config.eager_load = true
 
   # Show full error reports.
   config.consider_all_requests_local = true

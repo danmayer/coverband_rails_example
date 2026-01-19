@@ -1,0 +1,292 @@
+<div class="demo-configuration">
+  <h1>Coverband Configuration</h1>
+
+  <%= link_to "← Back to Demo Home", demo_path, class: "back-link" %>
+
+  <div class="config-section">
+    <h2>Current Configuration</h2>
+    <table class="config-table">
+      <thead>
+        <tr>
+          <th>Setting</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>track_views</code></td>
+          <td><strong><%= @current_config[:track_views] ? "✓ Enabled" : "✗ Disabled" %></strong></td>
+          <td>Tracks which views and partials are rendered</td>
+        </tr>
+        <tr>
+          <td><code>track_translations</code></td>
+          <td><strong><%= @current_config[:track_translations] ? "✓ Enabled" : "✗ Disabled" %></strong></td>
+          <td>Tracks which I18n translation keys are used</td>
+        </tr>
+        <tr>
+          <td><code>track_routes</code></td>
+          <td><strong><%= @current_config[:track_routes] ? "✓ Enabled" : "✗ Disabled" %></strong></td>
+          <td>Tracks which routes are accessed</td>
+        </tr>
+        <tr>
+          <td><code>verbose</code></td>
+          <td><strong><%= @current_config[:verbose] ? "✓ Enabled" : "✗ Disabled" %></strong></td>
+          <td>Enable verbose logging for debugging</td>
+        </tr>
+        <tr>
+          <td><code>store_type</code></td>
+          <td><code><%= @current_config[:store_type] %></code></td>
+          <td>Storage adapter for coverage data</td>
+        </tr>
+        <tr>
+          <td><code>background_reporting_sleep_seconds</code></td>
+          <td><%= @current_config[:background_reporting_sleep_seconds] %>s</td>
+          <td>How often to report coverage data</td>
+        </tr>
+        <tr>
+          <td><code>web_enable_clear</code></td>
+          <td><strong><%= @current_config[:web_enable_clear] ? "✓ Enabled" : "✗ Disabled" %></strong></td>
+          <td>Enable clear button in web interface</td>
+        </tr>
+        <tr>
+          <td><code>reporting_wiggle</code></td>
+          <td><%= @current_config[:reporting_wiggle] %>s</td>
+          <td>Random delay to avoid thundering herd</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="config-section">
+    <h2>Environment Variables</h2>
+    <p>You can configure Coverband using these environment variables. Restart the server after changing them.</p>
+
+    <table class="config-table">
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Current Value</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @env_configs.each do |config| %>
+          <tr>
+            <td><code><%= config[:name] %></code></td>
+            <td><strong><%= config[:current_value] %></strong></td>
+            <td><%= config[:description] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="config-section">
+    <h2>Testing Different Configurations</h2>
+
+    <div class="example-configs">
+      <div class="example-config">
+        <h3>Minimal Configuration (Fastest)</h3>
+        <pre><code>COVERBAND_TRACK_VIEWS=false \
+COVERBAND_TRACK_TRANSLATIONS=false \
+COVERBAND_TRACK_ROUTES=false \
+bundle exec rails s</code></pre>
+        <p>Only tracks code coverage, disables all additional trackers for maximum performance.</p>
+      </div>
+
+      <div class="example-config">
+        <h3>Full Tracking (Recommended for Development)</h3>
+        <pre><code>COVERBAND_TRACK_VIEWS=true \
+COVERBAND_TRACK_TRANSLATIONS=true \
+COVERBAND_TRACK_ROUTES=true \
+COVERBAND_VERBOSE=true \
+bundle exec rails s</code></pre>
+        <p>Enables all tracking features with verbose logging for debugging.</p>
+      </div>
+
+      <div class="example-config">
+        <h3>HashRedisStore (Better Performance for Large Apps)</h3>
+        <pre><code>COVERBAND_HASH_STORE=true \
+bundle exec rails s</code></pre>
+        <p>Uses HashRedisStore which provides better performance for applications with many files.</p>
+      </div>
+
+      <div class="example-config">
+        <h3>Paged Reporting (Memory Efficient)</h3>
+        <pre><code>COVERBAND_PAGER=true \
+COVERBAND_HASH_STORE=true \
+bundle exec rails s</code></pre>
+        <p>Enables paged reporting in the web interface to handle large codebases more efficiently.</p>
+      </div>
+
+      <div class="example-config">
+        <h3>Benchmark Mode (No Coverage Collection)</h3>
+        <pre><code>COVERBAND_DISABLE_AUTO_START=true \
+bundle exec rails s</code></pre>
+        <p>Disables automatic coverage collection for running benchmarks without overhead.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="config-section">
+    <h2>Storage Options</h2>
+
+    <div class="storage-info">
+      <h3>Default Redis Store</h3>
+      <p>The standard Redis store is suitable for most applications. It stores coverage data in Redis sorted sets.</p>
+      <ul>
+        <li>Good for small to medium applications</li>
+        <li>Simple and reliable</li>
+        <li>Lower memory usage</li>
+      </ul>
+
+      <h3>HashRedisStore</h3>
+      <p>An optimized version that uses Redis hashes for better performance with large codebases.</p>
+      <ul>
+        <li>Better performance for apps with 1000+ files</li>
+        <li>Faster data retrieval</li>
+        <li>Recommended for production use</li>
+      </ul>
+      <p>Enable with: <code>COVERBAND_HASH_STORE=true</code></p>
+
+      <h3>File Store</h3>
+      <p>Store coverage data in local files instead of Redis.</p>
+      <ul>
+        <li>No Redis dependency</li>
+        <li>Good for development</li>
+        <li>Not suitable for multi-server deployments</li>
+      </ul>
+      <p>Configure in <code>config/coverband.rb</code>:</p>
+      <pre><code>config.store = Coverband::Adapters::FileStore.new('/tmp/coverband_data')</code></pre>
+    </div>
+  </div>
+
+  <div class="config-section">
+    <h2>Configuration File</h2>
+    <p>The main configuration is in <code>config/coverband.rb</code>. Here's the current setup:</p>
+    <pre><code>Coverband.configure do |config|
+  config.track_views = ENV.fetch("COVERBAND_TRACK_VIEWS", "true") == "true"
+  config.track_translations = ENV.fetch("COVERBAND_TRACK_TRANSLATIONS", "true") == "true"
+  config.track_routes = ENV.fetch("COVERBAND_TRACK_ROUTES", "true") == "true"
+
+  # ... other settings
+end</code></pre>
+  </div>
+</div>
+
+<style>
+  .demo-configuration {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2c5aa0;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .config-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  .config-section h2 {
+    margin-top: 0;
+    color: #2c5aa0;
+    border-bottom: 2px solid #2c5aa0;
+    padding-bottom: 10px;
+  }
+
+  .config-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+
+  .config-table th,
+  .config-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .config-table th {
+    background: #f5f5f5;
+    font-weight: bold;
+    color: #333;
+  }
+
+  .config-table tr:hover {
+    background: #f9f9f9;
+  }
+
+  .config-table code {
+    background: #e8e8e8;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .example-configs {
+    display: grid;
+    gap: 20px;
+    margin: 20px 0;
+  }
+
+  .example-config {
+    padding: 15px;
+    background: #f9f9f9;
+    border-left: 4px solid #2c5aa0;
+    border-radius: 4px;
+  }
+
+  .example-config h3 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .example-config pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+  }
+
+  .example-config code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .storage-info h3 {
+    color: #333;
+    margin-top: 20px;
+  }
+
+  .storage-info ul {
+    margin: 10px 0;
+    padding-left: 25px;
+  }
+
+  .storage-info li {
+    margin: 5px 0;
+  }
+
+  pre code {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+</style>

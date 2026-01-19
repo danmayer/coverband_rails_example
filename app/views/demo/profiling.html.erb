@@ -1,0 +1,445 @@
+<div class="demo-profiling">
+  <h1>Memory Profiling & Stats</h1>
+
+  <%= link_to "← Back to Demo Home", demo_path, class: "back-link" %>
+
+  <div class="stats-section">
+    <h2>Current Memory Statistics</h2>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Ruby Objects</h3>
+        <div class="stat-value"><%= number_with_delimiter(@memory_stats[:total_objects]) %></div>
+        <div class="stat-label">Total Objects in Memory</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Free Objects</h3>
+        <div class="stat-value"><%= number_with_delimiter(@memory_stats[:free_objects]) %></div>
+        <div class="stat-label">Available for Allocation</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Strings</h3>
+        <div class="stat-value"><%= number_with_delimiter(@memory_stats[:strings]) %></div>
+        <div class="stat-label">String Objects</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Arrays</h3>
+        <div class="stat-value"><%= number_with_delimiter(@memory_stats[:arrays]) %></div>
+        <div class="stat-label">Array Objects</div>
+      </div>
+
+      <div class="stat-card">
+        <h3>Hashes</h3>
+        <div class="stat-value"><%= number_with_delimiter(@memory_stats[:hashes]) %></div>
+        <div class="stat-label">Hash Objects</div>
+      </div>
+
+      <% if @memory_stats[:vm_rss] %>
+        <div class="stat-card highlight">
+          <h3>RSS Memory</h3>
+          <div class="stat-value"><%= (@memory_stats[:vm_rss] / 1024.0).round(1) %> MB</div>
+          <div class="stat-label">Resident Set Size</div>
+        </div>
+      <% end %>
+    </div>
+
+    <% if @coverband_stats %>
+      <div class="coverband-stats">
+        <h3>Coverband Statistics</h3>
+        <div class="stat-value"><%= number_with_delimiter(@coverband_stats[:tracked_files]) %></div>
+        <div class="stat-label">Files Being Tracked</div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="profiling-section">
+    <h2>Memory Profiling Tasks</h2>
+
+    <div class="profiling-card">
+      <h3>Basic Memory Usage</h3>
+      <p>Check current memory usage of your Rails process:</p>
+      <pre><code>bundle exec rails runner "
+  require 'objspace'
+  puts 'Total Objects: ' + ObjectSpace.count_objects[:TOTAL].to_s
+  puts 'Free Objects: ' + ObjectSpace.count_objects[:FREE].to_s
+
+  # Process memory (Linux only)
+  if File.exist?('/proc/#{Process.pid}/status')
+    status = File.read('/proc/#{Process.pid}/status')
+    puts 'VmRSS: ' + status[/VmRSS:\s+(\d+)/, 1].to_s + ' kB'
+  end
+"</code></pre>
+    </div>
+
+    <div class="profiling-card">
+      <h3>Memory Diff Analysis</h3>
+      <p>Compare memory usage with and without Coverband:</p>
+
+      <h4>Without Coverband</h4>
+      <pre><code>COVERBAND_DISABLE_AUTO_START=true bundle exec rails runner "
+  require 'objspace'
+  GC.start
+  before = ObjectSpace.count_objects[:TOTAL]
+  puts 'Objects without Coverband: ' + before.to_s
+"</code></pre>
+
+      <h4>With Coverband</h4>
+      <pre><code>bundle exec rails runner "
+  require 'objspace'
+  GC.start
+  after = ObjectSpace.count_objects[:TOTAL]
+  puts 'Objects with Coverband: ' + after.to_s
+"</code></pre>
+    </div>
+
+    <div class="profiling-card">
+      <h3>Derailed Benchmarks</h3>
+      <p>Use the <code>derailed_benchmarks</code> gem for detailed memory profiling:</p>
+
+      <h4>Setup</h4>
+      <pre><code># Add to Gemfile
+gem 'derailed_benchmarks', group: :development
+
+# Install
+bundle install</code></pre>
+
+      <h4>Memory Usage Per Request</h4>
+      <pre><code># Without Coverband
+COVERBAND_DISABLE_AUTO_START=true bundle exec derailed exec perf:mem TEST=/posts
+
+# With Coverband
+bundle exec derailed exec perf:mem TEST=/posts</code></pre>
+
+      <h4>Objects Allocated Per Request</h4>
+      <pre><code>bundle exec derailed exec perf:objects TEST=/posts</code></pre>
+
+      <h4>Memory Over Time</h4>
+      <pre><code>bundle exec derailed exec perf:mem_over_time</code></pre>
+    </div>
+
+    <div class="profiling-card">
+      <h3>Memory Profiler Gem</h3>
+      <p>Get detailed memory allocation reports:</p>
+
+      <h4>Setup</h4>
+      <pre><code># Add to Gemfile
+gem 'memory_profiler', group: :development
+
+# Install
+bundle install</code></pre>
+
+      <h4>Profile a Block of Code</h4>
+      <pre><code>bundle exec rails runner "
+  require 'memory_profiler'
+
+  report = MemoryProfiler.report do
+    # Your code here
+    10.times { User.all.to_a }
+  end
+
+  report.pretty_print
+"</code></pre>
+
+      <h4>Profile Coverband Overhead</h4>
+      <pre><code>bundle exec rails runner "
+  require 'memory_profiler'
+
+  # Without coverage
+  COVERBAND_DISABLE_AUTO_START=true
+  report1 = MemoryProfiler.report do
+    Post.all.to_a
+  end
+
+  # With coverage (restart needed)
+  report2 = MemoryProfiler.report do
+    Post.all.to_a
+  end
+
+  report1.pretty_print
+  report2.pretty_print
+"</code></pre>
+    </div>
+  </div>
+
+  <div class="profiling-section">
+    <h2>Monitoring in Production</h2>
+
+    <div class="profiling-card">
+      <h3>APM Tools</h3>
+      <p>Use Application Performance Monitoring tools to track memory usage:</p>
+      <ul>
+        <li><strong>New Relic:</strong> Track memory consumption and object allocations</li>
+        <li><strong>Scout APM:</strong> Monitor memory and identify memory leaks</li>
+        <li><strong>Skylight:</strong> Ruby-specific insights into memory usage</li>
+        <li><strong>AppSignal:</strong> Memory monitoring with custom metrics</li>
+      </ul>
+    </div>
+
+    <div class="profiling-card">
+      <h3>Custom Metrics</h3>
+      <p>Add custom metrics to track Coverband's impact:</p>
+      <pre><code># In an initializer or monitoring setup
+if defined?(Coverband)
+  # Track number of files being monitored
+  StatsD.gauge('coverband.tracked_files',
+    Coverband.configuration.store.coverage.keys.length)
+
+  # Track memory usage
+  StatsD.gauge('coverband.memory.rss',
+    `ps -o rss= -p #{Process.pid}`.to_i)
+end</code></pre>
+    </div>
+
+    <div class="profiling-card">
+      <h3>Redis Memory Usage</h3>
+      <p>Monitor Redis memory used by Coverband:</p>
+      <pre><code># Connect to Redis
+redis-cli
+
+# Get memory info
+INFO memory
+
+# Get size of Coverband keys
+MEMORY USAGE coverband_3_1_production</code></pre>
+
+      <p>Estimate total Coverband Redis usage:</p>
+      <pre><code>bundle exec rails runner "
+  redis = Coverband.configuration.store.instance_variable_get(:@redis)
+  keys = redis.keys('coverband*')
+  total_size = keys.sum { |key| redis.memory('USAGE', key) rescue 0 }
+  puts 'Coverband Redis usage: ' + (total_size / 1024.0 / 1024.0).round(2).to_s + ' MB'
+"</code></pre>
+    </div>
+  </div>
+
+  <div class="profiling-section">
+    <h2>Optimization Guidelines</h2>
+
+    <div class="optimization-info">
+      <h3>Memory Optimization Strategies</h3>
+
+      <h4>1. Adjust Reporting Frequency</h4>
+      <p>Increase <code>background_reporting_sleep_seconds</code> to reduce memory churn:</p>
+      <pre><code>config.background_reporting_sleep_seconds = 300  # 5 minutes</code></pre>
+
+      <h4>2. Ignore Unnecessary Files</h4>
+      <p>Exclude gems and vendor code to reduce tracking overhead:</p>
+      <pre><code>config.ignore = [
+  'vendor/',
+  'node_modules/',
+  '.bundle/',
+  'spec/',
+  'test/'
+]</code></pre>
+
+      <h4>3. Use HashRedisStore</h4>
+      <p>More memory-efficient for large applications:</p>
+      <pre><code>config.store = Coverband::Adapters::HashRedisStore.new(redis)</code></pre>
+
+      <h4>4. Disable Unused Trackers</h4>
+      <p>Only enable trackers you need:</p>
+      <pre><code>config.track_views = false        # if not using view tracking
+config.track_translations = false # if not using translation tracking
+config.track_routes = false       # if not using route tracking</code></pre>
+
+      <h4>5. Clear Old Data Regularly</h4>
+      <p>Set up periodic cleanup of old coverage data:</p>
+      <pre><code># In a scheduled job or cron
+Coverband.configuration.store.clear!</code></pre>
+    </div>
+  </div>
+
+  <div class="profiling-section">
+    <h2>Troubleshooting Memory Issues</h2>
+
+    <div class="troubleshooting-info">
+      <h3>Common Memory Problems</h3>
+
+      <h4>Memory Leak Detection</h4>
+      <p>If you suspect a memory leak related to Coverband:</p>
+      <ol>
+        <li>Run with <code>COVERBAND_DISABLE_AUTO_START=true</code> to verify the leak is Coverband-related</li>
+        <li>Use <code>memory_profiler</code> to identify which objects are not being garbage collected</li>
+        <li>Check Redis memory usage growth over time</li>
+        <li>Review your ignore patterns - tracking too many files can cause issues</li>
+      </ol>
+
+      <h4>High Memory Usage</h4>
+      <p>If Coverband is using too much memory:</p>
+      <ul>
+        <li>Check how many files are being tracked</li>
+        <li>Verify ignore patterns are working correctly</li>
+        <li>Consider using paged reporting for large codebases</li>
+        <li>Increase reporting interval to reduce in-memory data</li>
+      </ul>
+
+      <h4>Redis Out of Memory</h4>
+      <p>If Redis runs out of memory:</p>
+      <ul>
+        <li>Clear old coverage data: <code>Coverband.configuration.store.clear!</code></li>
+        <li>Increase Redis maxmemory limit</li>
+        <li>Set up automatic expiration for keys</li>
+        <li>Consider using a separate Redis instance for Coverband</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .demo-profiling {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #2c5aa0;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .stats-section h2,
+  .profiling-section h2 {
+    color: #2c5aa0;
+    border-bottom: 2px solid #2c5aa0;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .stat-card.highlight {
+    border-color: #2c5aa0;
+    border-width: 2px;
+  }
+
+  .stat-card h3 {
+    margin-top: 0;
+    color: #555;
+    font-size: 0.9em;
+    text-transform: uppercase;
+  }
+
+  .stat-value {
+    font-size: 2em;
+    font-weight: bold;
+    color: #2c5aa0;
+    margin: 10px 0;
+  }
+
+  .stat-label {
+    color: #666;
+    font-size: 0.9em;
+  }
+
+  .coverband-stats {
+    background: #f0f7ff;
+    border-left: 4px solid #2c5aa0;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 4px;
+    text-align: center;
+  }
+
+  .coverband-stats h3 {
+    margin-top: 0;
+    color: #2c5aa0;
+  }
+
+  .profiling-section {
+    margin: 40px 0;
+  }
+
+  .profiling-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+
+  .profiling-card h3 {
+    color: #333;
+    margin-top: 0;
+  }
+
+  .profiling-card h4 {
+    color: #555;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .profiling-card pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 10px 0;
+  }
+
+  .profiling-card code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+  }
+
+  .profiling-card ul,
+  .profiling-card ol {
+    margin: 10px 0;
+    padding-left: 25px;
+  }
+
+  .profiling-card li {
+    margin: 8px 0;
+  }
+
+  .optimization-info,
+  .troubleshooting-info {
+    background: #f0f7ff;
+    border-left: 4px solid #2c5aa0;
+    padding: 20px;
+    border-radius: 4px;
+  }
+
+  .optimization-info h3,
+  .troubleshooting-info h3 {
+    color: #2c5aa0;
+    margin-top: 0;
+  }
+
+  .optimization-info h4,
+  .troubleshooting-info h4 {
+    color: #333;
+    margin-top: 20px;
+  }
+
+  .optimization-info pre,
+  .troubleshooting-info pre {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 15px;
+    border-radius: 5px;
+    overflow-x: auto;
+  }
+</style>

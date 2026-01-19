@@ -1,5 +1,6 @@
+require_relative "../helpers/unused_helper"
 class BooksController < ApplicationController
-  before_action :set_book, only: %i[ show edit update destroy ]
+  before_action :set_book, only: %i[show edit update destroy]
 
   # GET /books or /books.json
   def index
@@ -8,6 +9,8 @@ class BooksController < ApplicationController
 
   # GET /books/1 or /books/1.json
   def show
+    # @unused_variable = UnusedHelper.unused_method
+    @another_unused = "string"
   end
 
   # GET /books/new
@@ -16,8 +19,7 @@ class BooksController < ApplicationController
   end
 
   # GET /books/1/edit
-  def edit
-  end
+  def edit; end
 
   # POST /books or /books.json
   def create
@@ -58,13 +60,14 @@ class BooksController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_book
-      @book = Book.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def book_params
-      params.require(:book).permit(:title, :content, :author)
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_book
+    @book = Book.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def book_params
+    params.require(:book).permit(:title, :content, :author)
+  end
 end

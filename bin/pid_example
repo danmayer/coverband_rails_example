@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+process_id = Process.pid
+child_processes = `ps -o pid,ppid,tid --no-headers -p #{process_id}`.split("\n")
+child_processes.each do |child_process|
+  pid, ppid, tid = child_process.split
+  puts "Child Process ID: #{pid}, Parent Process ID: #{ppid}, Thread ID: #{tid}"
+  child_threads = `ps -o pid,ppid,tid --no-headers -p #{pid}`.split("\n")
+  child_threads.each do |child_thread|
+    tpid, tppid, ttid = child_thread.split
+    puts "Child Thread ID: #{ttid}, Parent Process ID: #{tpid}, Thread ID: #{ttid}"
+  end
+end
