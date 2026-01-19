@@ -1,5 +1,7 @@
-PATH
-  remote: ../coverband
+GIT
+  remote: https://github.com/danmayer/coverband.git
+  revision: 9344004e7b0f862ffa6d045dd521fda25528e7e6
+  branch: main
   specs:
     coverband (6.1.6)
       base64

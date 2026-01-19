@@ -47,7 +47,8 @@ gem "bootsnap", require: false
 # gem "coverband", "6.0.3.rc.1"
 # gem "coverband", "6.0.1"
 # When debugging and developing locally, use below to point to a local copy of the gem
-gem "coverband", path: "../coverband"
+# gem "coverband", path: "../coverband"
+gem "coverband", git: "https://github.com/danmayer/coverband.git", branch: "main"
 gem "mcp" # Required for MCP server support
 gem "simplecov", require: false
 gem "simplecov-html", require: false
