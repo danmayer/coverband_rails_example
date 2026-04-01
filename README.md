@@ -2,6 +2,8 @@
 
 A comprehensive demonstration application showcasing all of [Coverband's](https://github.com/danmayer/coverband) features, configuration options, and performance characteristics. This demo helps you understand how Coverband works and how to integrate it into your Rails applications.
 
+See the live shared demo [https://coverband-rails-example.onrender.com/](https://coverband-rails-example.onrender.com/)
+
 ## What is Coverband?
 
 Coverband is a Ruby code coverage tool for production environments. Unlike traditional test coverage tools, Coverband tracks which code is actually executed in production, helping you:
@@ -17,7 +19,7 @@ This demo showcases all major Coverband features:
 
 # Deploy to Render
 
-This application is configured to be easily deployed on [Render.com](https://render.com).
+This application is configured to be easily deployed on [Render.com](https://render.com). on our subdomain [coverband-rails-example.onrender.com](https://coverband-rails-example.onrender.com/)
 
 1.  Fork this repository.
 2.  Create a new Web Service on Render.
