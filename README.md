@@ -133,9 +133,12 @@ Coverband is highly configurable. This demo lets you test different configuratio
 | `COVERBAND_TRACK_VIEWS` | `true` | Enable/disable view tracking |
 | `COVERBAND_TRACK_TRANSLATIONS` | `true` | Enable/disable translation tracking |
 | `COVERBAND_TRACK_ROUTES` | `true` | Enable/disable route tracking |
+| `COVERBAND_TRACK_QUERY_BURSTS` | `true` | Enable/disable query burst tracking |
 | `COVERBAND_VERBOSE` | `false` | Enable verbose logging |
 | `COVERBAND_HASH_STORE` | `false` | Use HashRedisStore for better performance |
 | `COVERBAND_PAGER` | `false` | Enable paged reporting for large apps |
+| `COVERBAND_WEB_ENABLE_CLEAR` | development only | Enable destructive clear controls in the web report |
+| `COVERBAND_MCP_ENABLED` | `false` | Enable the MCP endpoint; requires `COVERBAND_MCP_PASSWORD` |
 | `COVERBAND_DISABLE_AUTO_START` | `false` | Disable coverage collection (for benchmarking) |
 
 ### Example Configurations
