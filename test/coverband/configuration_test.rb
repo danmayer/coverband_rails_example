@@ -77,9 +77,15 @@ class Coverband::ConfigurationTest < ActiveSupport::TestCase
     assert Coverband.configuration.respond_to?(:web_enable_clear),
            "Configuration should support web clear button"
 
-    # In this demo, we enable it for easy testing
-    assert Coverband.configuration.web_enable_clear,
-           "Web clear button should be enabled in demo"
+    # Destructive controls are disabled outside development unless explicitly
+    # enabled with COVERBAND_WEB_ENABLE_CLEAR=true.
+    assert_not Coverband.configuration.web_enable_clear,
+               "Web clear button should be disabled in the test environment"
+  end
+
+  test "mcp is disabled unless explicitly enabled" do
+    assert_not Coverband.configuration.mcp_enabled?,
+               "MCP should not be exposed without explicit configuration"
   end
 
   # Test: Background reporting interval

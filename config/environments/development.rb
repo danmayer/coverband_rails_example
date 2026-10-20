@@ -21,9 +21,34 @@ Rails.application.configure do
   # Enable server timing
   config.server_timing = true
 
+  # Coverband ActiveSupport::Cache adapter testing.
+  # COVERBAND_CACHE_STORE=redis|memcached|solid_cache picks the backing cache
+  # store that Coverband::Adapters::ActiveSupportCacheStore writes through.
+  if (coverband_cache = ENV["COVERBAND_CACHE_STORE"])
+    config.action_controller.perform_caching = true
+
+    config.cache_store =
+      case coverband_cache
+      when "redis"
+        [:redis_cache_store, {url: ENV.fetch("REDIS_URL", "redis://localhost:6379/1")}]
+      when "memcached"
+        # COVERBAND_MEMCACHED_MAX_BYTES shrinks Dalli's value ceiling so the
+        # oversized-document path can be exercised without a huge app
+        opts = {}
+        opts[:value_max_bytes] = ENV["COVERBAND_MEMCACHED_MAX_BYTES"].to_i if ENV["COVERBAND_MEMCACHED_MAX_BYTES"]
+        [:mem_cache_store, ENV.fetch("MEMCACHED_URL", "localhost:11211"), opts]
+      when "solid_cache"
+        # max_age: nil keeps Coverband documents from aging out on Solid Cache's
+        # default two week write-age clock, as the adapter docs recommend.
+        [:solid_cache_store, {max_age: nil, max_entries: 100_000}]
+      when "memory"
+        :memory_store
+      else
+        raise "unknown COVERBAND_CACHE_STORE #{coverband_cache.inspect}"
+      end
   # Enable/disable caching. By default caching is disabled.
   # Run rails dev:cache to toggle caching.
-  if Rails.root.join("tmp/caching-dev.txt").exist?
+  elsif Rails.root.join("tmp/caching-dev.txt").exist?
     config.action_controller.perform_caching = true
     config.action_controller.enable_fragment_cache_logging = true
 

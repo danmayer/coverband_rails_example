@@ -4,6 +4,8 @@ ruby "3.4.7"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.3"
+# Rails 7.1 passes legacy options that JSON 3 rejects.
+gem "json", "< 3"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -48,12 +50,16 @@ gem "bootsnap", require: false
 # gem "coverband", "6.0.1"
 # When debugging and developing locally, use below to point to a local copy of the gem
 # gem "coverband", path: "../coverband"
-gem "coverband", git: "https://github.com/danmayer/coverband.git", branch: "main"
-gem "mcp" # Required for MCP server support
+gem "coverband", "7.0.0.rc.2"
+gem "mcp", ">= 0.23" # Required for MCP server support
 gem "simplecov", require: false
 gem "simplecov-html", require: false
 
 gem "toxiproxy"
+
+# Cache backends for testing the ActiveSupport::Cache adapter
+gem "dalli" # memcached client for ActiveSupport::Cache::MemCacheStore
+gem "solid_cache", "~> 0.7.0" # 1.x requires Rails 7.2+, this app is on 7.1
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

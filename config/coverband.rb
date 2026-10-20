@@ -1,6 +1,29 @@
 Coverband.configure do |config|
   config.logger = defined?(Rails) ? Rails.logger : Logger.new($stdout)
 
+  # ActiveSupport::Cache adapter (Coverband 7.0+)
+  # COVERBAND_CACHE_STORE=redis|memcached|solid_cache|rails_cache
+  # The cache itself is built in config/environments/development.rb so this uses
+  # the documented lazy block form: Rails.cache does not exist yet at this point.
+  if (coverband_cache_store = ENV.fetch("COVERBAND_CACHE_STORE", nil))
+    config.store =
+      if ENV["COVERBAND_CACHE_EAGER"]
+        # eager form: hand the adapter a store built right here
+        cache =
+          case coverband_cache_store
+          when "redis"
+            ActiveSupport::Cache::RedisCacheStore.new(url: ENV.fetch("REDIS_URL", "redis://localhost:6379/1"))
+          when "memcached"
+            ActiveSupport::Cache::MemCacheStore.new(ENV.fetch("MEMCACHED_URL", "localhost:11211"))
+          when "solid_cache"
+            SolidCache::Store.new(max_age: nil, max_entries: 100_000)
+          end
+        Coverband::Adapters::ActiveSupportCacheStore.new(cache)
+      else
+        Coverband::Adapters::ActiveSupportCacheStore.new { Rails.cache }
+      end
+  end
+
   if ENV["COVERBAND_HASH_STORE"] || ENV["COVERBAND_PAGER"]
     Rails.logger.debug "using hash store"
     redis_url = ENV["REDIS_URL"] || "redis://localhost:6379/0"
@@ -18,8 +41,9 @@ Coverband.configure do |config|
   # hit perf.
   config.verbose = ENV.fetch("COVERBAND_VERBOSE", "false") == "true"
 
-  # default false. button at the top of the web interface which clears all data
-  config.web_enable_clear = true
+  # Keep the public report read-only in production. Enable this deliberately
+  # when demonstrating destructive clear operations.
+  config.web_enable_clear = ENV.fetch("COVERBAND_WEB_ENABLE_CLEAR", Rails.env.development?.to_s) == "true"
 
   # avoid all your servers reporting at once... In production I recommend 30
   config.reporting_wiggle = 2
@@ -41,7 +65,14 @@ Coverband.configure do |config|
   # Tracks which routes are accessed in your application
   config.track_routes = ENV.fetch("COVERBAND_TRACK_ROUTES", "true") == "true"
 
-  # MCP Configuration
-  config.mcp_enabled = true
-  config.mcp_password = ENV["COVERBAND_MCP_PASSWORD"] || "dev-password-123"
+  # Query Burst Tracker Configuration
+  config.track_query_bursts = ENV.fetch("COVERBAND_TRACK_QUERY_BURSTS", "true") == "true"
+
+  # MCP is opt-in and cannot be exposed without a secret. Production must also
+  # be explicitly included because Coverband defaults MCP to development/test.
+  if ENV.fetch("COVERBAND_MCP_ENABLED", "false") == "true"
+    config.mcp_enabled = true
+    config.mcp_allowed_environments = %w[development test production]
+    config.mcp_password = ENV.fetch("COVERBAND_MCP_PASSWORD")
+  end
 end
